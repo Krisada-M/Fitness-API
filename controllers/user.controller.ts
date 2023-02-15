@@ -5,7 +5,7 @@ import { FitnessUser, status } from "../database/entitys/user.entity";
 import {
   classBookingRepository,
   trainerBookingRepository,
-  userRepository
+  userRepository,
 } from "../database/repository";
 import * as UserService from "../services/user.service";
 
@@ -46,6 +46,36 @@ export const createUsers = async (req: Request, res: Response) => {
   }
 
   const user = userRepository.create(userInput);
+  const results = await userRepository.save(user).catch((err) => {
+    if (+err.sqlState === 23000) {
+      const duplicateName = `${err.sqlMessage.split(" ")[2]} is already use`;
+      res.status(400).json({ msg: duplicateName });
+    } else {
+      console.log(err);
+    }
+  });
+
+  return res.status(200).json(results);
+};
+
+// Update user
+export const updateUsers = async (req: Request, res: Response) => {
+  const userInput = req.body as FitnessUser;
+  const validate = UserService.validateInput(userInput);
+
+  if (validate != null) {
+    return res.status(400).json({ msg: validate });
+  }
+
+  const user = await userRepository.findOneBy({
+    ID: userInput.ID,
+  });
+  user.email = userInput.email;
+  user.firstname = userInput.firstname;
+  user.lastname = userInput.lastname;
+  user.password = userInput.password;
+  user.telephone = userInput.telephone;
+
   const results = await userRepository.save(user).catch((err) => {
     if (+err.sqlState === 23000) {
       const duplicateName = `${err.sqlMessage.split(" ")[2]} is already use`;

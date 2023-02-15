@@ -3,7 +3,7 @@ import * as express from "express";
 import { env } from "process";
 import {
   allClassBooking,
-  allTrainerBooking
+  allTrainerBooking,
 } from "./controllers/booking.controller";
 import { addPackage, allPackage } from "./controllers/package.controller";
 import {
@@ -11,8 +11,9 @@ import {
   createUsers,
   getProfileUser,
   loginUser,
+  updateUsers,
   userBooking,
-  userSelectPackage
+  userSelectPackage,
 } from "./controllers/user.controller";
 import * as database from "./database/data-source";
 
@@ -34,6 +35,9 @@ app.get("/", (_: Request, res: Response) => {
 
 // Create user
 app.post("/register", createUsers);
+
+// Update user
+app.post("/update", updateUsers);
 
 // Login user
 app.post("/login", loginUser);
